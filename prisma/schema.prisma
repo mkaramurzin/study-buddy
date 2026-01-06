@@ -21,10 +21,8 @@ model Entry {
   content String?
   tags    String[]
 
-  // Type-specific JSON fields
-  vocabData  Json? // term, part_of_speech, definition, example_sentence, reciprocal_word, synonyms
-  quoteData  Json? // quote, author, context
-  phraseData Json? // phrase, phrase_type, source_context, why_it_stood_out
+  // Universal metadata field - schema varies by type
+  metadata Json?
 
   confidence Float   @default(0)
   isTemplate Boolean @default(false)
@@ -38,12 +36,15 @@ model Entry {
 }
 
 enum EntryType {
-  vocab
-  quote
-  phrase
-  thought_wrapper
-  prompt
-  reflection
-  template
-  unknown
+  concept     // Definitions, terms, ideas (any field)
+  principle   // Laws, rules, heuristics, patterns
+  quote       // Memorable statements with attribution
+  example     // Concrete instances, cases, worked problems
+  procedure   // Step-by-step methods, algorithms
+  question    // Problems to solve, things to investigate
+  connection  // Analogies, links between ideas
+  note        // Freeform observations, reflections
+  reference   // Pointers to external sources
+  template    // Structural/organizational elements
+  unknown     // Fallback
 }

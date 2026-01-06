@@ -7,11 +7,15 @@ import { EntryCard } from "@/components/entry-card";
 
 const ENTRY_TYPES = [
   { value: "all", label: "All" },
-  { value: "vocab", label: "Vocabulary" },
+  { value: "concept", label: "Concepts" },
+  { value: "principle", label: "Principles" },
   { value: "quote", label: "Quotes" },
-  { value: "phrase", label: "Phrases" },
-  { value: "thought_wrapper", label: "Thought Wrappers" },
-  { value: "reflection", label: "Reflections" },
+  { value: "example", label: "Examples" },
+  { value: "procedure", label: "Procedures" },
+  { value: "question", label: "Questions" },
+  { value: "connection", label: "Connections" },
+  { value: "note", label: "Notes" },
+  { value: "reference", label: "References" },
 ];
 
 interface Entry {
@@ -20,9 +24,7 @@ interface Entry {
   title: string | null;
   content: string | null;
   tags: string[];
-  vocabData: Record<string, unknown> | null;
-  quoteData: Record<string, unknown> | null;
-  phraseData: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
   confidence: number;
   createdAt: string;
 }
@@ -91,7 +93,7 @@ export default function DashboardPage() {
             href="/"
             className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
           >
-            Commonplace
+            Studybase
           </Link>
           <div className="flex items-center gap-4">
             <Link

@@ -1,11 +1,11 @@
-# Commonplace Doc Study
+# Studybase
 
-A web app that helps you study and internalize your commonplace book entries. Upload PDF documents containing vocabulary, quotes, and phrases, and practice with an AI tutor that uses only your own collected material.
+A web app that helps you study and internalize knowledge from any field. Upload PDF documents, let AI classify the content, and practice with an AI tutor that uses only your own collected material.
 
 ## Features
 
-- **PDF Upload & Processing**: Upload commonplace book PDFs and automatically extract and classify entries
-- **AI Classification**: Entries are classified into types: vocab, quote, phrase, thought_wrapper, reflection, etc.
+- **PDF Upload & Processing**: Upload any PDF and automatically extract and classify knowledge entries
+- **AI Classification**: Entries are classified into universal types: concept, principle, quote, example, procedure, question, connection, note, reference
 - **Dashboard**: View and filter all your entries by type
 - **Practice Chat**: Quiz yourself with an AI that uses only your own entries
 
@@ -40,7 +40,7 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # Database (PostgreSQL)
-DATABASE_URL="postgresql://user:password@localhost:5432/commonplace?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/studybase?schema=public"
 
 # OpenAI
 OPENAI_API_KEY=sk-...
@@ -49,10 +49,6 @@ OPENAI_API_KEY=sk-...
 ### 3. Set up the database
 
 ```bash
-# Run migrations
-npx prisma migrate dev --name init
-
-# Or push schema directly (for development)
 npx prisma db push
 ```
 
@@ -81,18 +77,22 @@ For the database, you can use:
 ## Usage
 
 1. **Sign in** using Clerk authentication
-2. **Upload** a PDF of your commonplace book
+2. **Upload** any PDF document
 3. Wait for AI to **classify** your entries
 4. **Browse** your entries in the dashboard
 5. **Practice** with the AI chat to quiz yourself
 
 ## Entry Types
 
-- `vocab`: Vocabulary words with definitions, examples, synonyms
-- `quote`: Quotes with author and context
-- `phrase`: Notable phrases with analysis
-- `thought_wrapper`: Introductory phrases for ideas
-- `reflection`: Personal reflections
+- `concept`: Definitions, terms, ideas from any field
+- `principle`: Laws, rules, heuristics, patterns
+- `quote`: Memorable statements with attribution
+- `example`: Concrete instances, case studies, worked problems
+- `procedure`: Step-by-step methods, algorithms, processes
+- `question`: Problems to solve, research questions
+- `connection`: Analogies, links between ideas
+- `note`: Freeform observations, reflections
+- `reference`: Pointers to external sources
 - `template`: Structural content (filtered out by default)
 
 ## Project Structure

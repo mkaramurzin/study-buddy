@@ -92,7 +92,7 @@ export default function UploadPage() {
             href="/"
             className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
           >
-            Commonplace
+            Studybase
           </Link>
           <div className="flex items-center gap-4">
             <Link
@@ -117,7 +117,7 @@ export default function UploadPage() {
           Upload Document
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mb-8">
-          Upload a PDF of your commonplace book to extract and classify entries.
+          Upload a PDF document to extract and classify knowledge entries.
         </p>
 
         <div

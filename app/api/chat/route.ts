@@ -41,38 +41,33 @@ export async function POST(request: NextRequest) {
         title: true,
         content: true,
         tags: true,
-        vocabData: true,
-        quoteData: true,
-        phraseData: true,
+        metadata: true,
       },
       take: 100, // Limit to recent 100 entries for context
       orderBy: { createdAt: "desc" },
     });
 
-    // Format entries for the AI
+    // Format entries for the AI - generic metadata handling
     const formattedEntries = entries.map((entry) => {
       const parts: string[] = [`Type: ${entry.type}`];
       
       if (entry.title) parts.push(`Title: ${entry.title}`);
       
-      if (entry.type === "vocab" && entry.vocabData) {
-        const vocab = entry.vocabData as Record<string, unknown>;
-        if (vocab.term) parts.push(`Term: ${vocab.term}`);
-        if (vocab.definition) parts.push(`Definition: ${vocab.definition}`);
-        if (vocab.example_sentence) parts.push(`Example: ${vocab.example_sentence}`);
-        if (vocab.synonyms && Array.isArray(vocab.synonyms)) {
-          parts.push(`Synonyms: ${vocab.synonyms.join(", ")}`);
+      // Format metadata fields generically
+      if (entry.metadata && typeof entry.metadata === "object") {
+        const meta = entry.metadata as Record<string, unknown>;
+        for (const [key, value] of Object.entries(meta)) {
+          if (value && value !== "") {
+            if (Array.isArray(value) && value.length > 0) {
+              parts.push(`${key}: ${value.join(", ")}`);
+            } else if (typeof value === "string" && value.trim()) {
+              parts.push(`${key}: ${value}`);
+            }
+          }
         }
-      } else if (entry.type === "quote" && entry.quoteData) {
-        const quote = entry.quoteData as Record<string, unknown>;
-        if (quote.quote) parts.push(`Quote: "${quote.quote}"`);
-        if (quote.author) parts.push(`Author: ${quote.author}`);
-      } else if (entry.type === "phrase" && entry.phraseData) {
-        const phrase = entry.phraseData as Record<string, unknown>;
-        if (phrase.phrase) parts.push(`Phrase: ${phrase.phrase}`);
-        if (phrase.phrase_type) parts.push(`Type: ${phrase.phrase_type}`);
-        if (phrase.why_it_stood_out) parts.push(`Note: ${phrase.why_it_stood_out}`);
-      } else if (entry.content) {
+      }
+      
+      if (entry.content) {
         parts.push(`Content: ${entry.content}`);
       }
       
@@ -86,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
     const contextSummary = `
-User's Commonplace Database Summary:
+User's Knowledge Base Summary:
 - Total entries available: ${entries.length}
 - Breakdown: ${Object.entries(entryCountByType)
       .map(([type, count]) => `${type}: ${count}`)

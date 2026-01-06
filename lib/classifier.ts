@@ -21,9 +21,7 @@ export interface ClassifiedEntry {
   title: string;
   content: string;
   tags: string[];
-  vocab: JsonObject;
-  quote: JsonObject;
-  phrase: JsonObject;
+  metadata: JsonObject;
   meta: {
     confidence: number;
     detected_sections: string[];
@@ -38,9 +36,7 @@ export interface ProcessedEntry {
   title: string | null;
   content: string | null;
   tags: string[];
-  vocabData: JsonObject | null;
-  quoteData: JsonObject | null;
-  phraseData: JsonObject | null;
+  metadata: JsonObject | null;
   confidence: number;
   isTemplate: boolean;
   parseError: boolean;
@@ -98,9 +94,7 @@ export async function classifyChunk(chunk: TextChunk): Promise<ProcessedEntry> {
         title: null,
         content: null,
         tags: [],
-        vocabData: null,
-        quoteData: null,
-        phraseData: null,
+        metadata: null,
         confidence: 0,
         isTemplate: false,
         parseError: true,
@@ -109,19 +103,15 @@ export async function classifyChunk(chunk: TextChunk): Promise<ProcessedEntry> {
 
     const entry = parsed.val;
 
-    // Check if vocab/quote/phrase objects have meaningful content
-    const hasVocab =
-      entry.vocab?.term &&
-      typeof entry.vocab.term === "string" &&
-      entry.vocab.term.trim() !== "";
-    const hasQuote =
-      entry.quote?.quote &&
-      typeof entry.quote.quote === "string" &&
-      entry.quote.quote.trim() !== "";
-    const hasPhrase =
-      entry.phrase?.phrase &&
-      typeof entry.phrase.phrase === "string" &&
-      entry.phrase.phrase.trim() !== "";
+    // Check if metadata has meaningful content (at least one non-empty value)
+    const hasMetadata =
+      entry.metadata &&
+      typeof entry.metadata === "object" &&
+      Object.values(entry.metadata).some(
+        (v) =>
+          (typeof v === "string" && v.trim() !== "") ||
+          (Array.isArray(v) && v.length > 0)
+      );
 
     return {
       chunkClean: chunk.clean,
@@ -130,9 +120,7 @@ export async function classifyChunk(chunk: TextChunk): Promise<ProcessedEntry> {
       title: entry.title || null,
       content: entry.content || null,
       tags: entry.tags || [],
-      vocabData: hasVocab ? entry.vocab : null,
-      quoteData: hasQuote ? entry.quote : null,
-      phraseData: hasPhrase ? entry.phrase : null,
+      metadata: hasMetadata ? entry.metadata : null,
       confidence: entry.meta?.confidence ?? 0,
       isTemplate: entry.meta?.is_template ?? false,
       parseError: false,
@@ -146,9 +134,7 @@ export async function classifyChunk(chunk: TextChunk): Promise<ProcessedEntry> {
       title: null,
       content: null,
       tags: [],
-      vocabData: null,
-      quoteData: null,
-      phraseData: null,
+      metadata: null,
       confidence: 0,
       isTemplate: false,
       parseError: true,

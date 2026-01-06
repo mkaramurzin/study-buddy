@@ -7,7 +7,7 @@ export default function Home() {
       <header className="border-b border-neutral-200 dark:border-neutral-800">
         <nav className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            Commonplace
+            Studybase
           </h1>
           <div className="flex items-center gap-4">
             <SignedOut>
@@ -33,11 +33,11 @@ export default function Home() {
       <main className="max-w-4xl mx-auto px-4 py-20">
         <div className="text-center space-y-6">
           <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100">
-            Study Your Commonplace Book
+            Study Your Knowledge Base
           </h2>
           <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-            Upload your PDF commonplace documents and let AI help you practice
-            and internalize vocabulary, quotes, and phrases you&apos;ve collected.
+            Upload your PDF documents and let AI help you practice
+            and internalize concepts, principles, quotes, and more from any field of study.
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
@@ -86,8 +86,8 @@ export default function Home() {
               Upload PDFs
             </h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Import your commonplace documents and automatically extract vocabulary,
-              quotes, and phrases.
+              Import your documents and automatically extract concepts, principles,
+              quotes, examples, procedures, and more.
             </p>
           </div>
 

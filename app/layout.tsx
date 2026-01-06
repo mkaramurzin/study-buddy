@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Commonplace Doc Study",
-  description: "Practice and internalize your commonplace book entries",
+  title: "Studybase",
+  description: "Upload documents and practice with AI to internalize any knowledge",
 };
 
 export default function RootLayout({

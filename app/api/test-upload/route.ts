@@ -5,47 +5,71 @@ import { segmentText, generateUploadId } from "@/lib/segmenter";
 import { classifyChunks, JsonObject } from "@/lib/classifier";
 import { EntryType, Prisma } from "@prisma/client";
 
-// Sample commonplace text for testing without uploading a PDF
+// Sample text for testing without uploading a PDF
 const SAMPLE_TEXT = `
-# Example Commonplace Notes
+# Example Knowledge Base Notes
 
-This document is an example set of notes designed to test the Instant Study Buddy app. It contains vocabulary, phrases, quotes, and thought frameworks.
+This document tests the universal knowledge system with concepts, principles, quotes, examples, procedures, questions, connections, notes, and references.
 
-# Vocabulary
+# Concepts
 
-Profundity — noun — deep insight, intellectual depth, or great intensity of thought, knowledge, or emotion. Example: The philosopher's writings were filled with profundity.
+Profundity — noun — deep insight, intellectual depth, or great intensity of thought. Field: Philosophy. Example: The philosopher's writings were filled with profundity.
 
-Cogent — adjective — clear, logical, and convincing; appealing effectively to reason. Example: She presented a cogent argument that persuaded even her strongest critics.
+Recursion — In computer science, a technique where a function calls itself to solve a problem by breaking it into smaller instances.
 
-Ubiquitous — adjective — present, appearing, or found everywhere at the same time. Example: Smartphones have become ubiquitous in modern life.
+Entropy — A measure of disorder or randomness in a system. In thermodynamics, it always increases in an isolated system.
 
-Motif — noun — a recurring element, theme, or idea in a work of art, literature, or music that has symbolic significance.
+# Principles
 
-Exhume — verb — to dig out or remove something buried, especially a body from the ground; more broadly, to bring something forgotten or hidden back to light.
+Pareto Principle (80/20 Rule) — Roughly 80% of effects come from 20% of causes. Domain: Business, productivity. Conditions: Applies to unequal distributions.
 
-# Phrases & Expressions
+DRY (Don't Repeat Yourself) — Every piece of knowledge must have a single, unambiguous representation. Domain: Software engineering.
 
-Second-order thinking — considering not just the immediate effects of an action, but the subsequent consequences.
-
-Skin in the game — having personal risk or investment in an outcome.
-
-Zoom out — to take a broader, long-term perspective on a problem.
+Newton's First Law — An object at rest stays at rest, and an object in motion stays in motion, unless acted upon by an external force.
 
 # Quotes
 
-"The unexamined life is not worth living." — Socrates
+"The unexamined life is not worth living." — Socrates, from The Apology
 
-"What we think, we become." — Buddha
+"All models are wrong, but some are useful." — George Box, statistician
 
-"All models are wrong, but some are useful." — George Box
+"Premature optimization is the root of all evil." — Donald Knuth
 
-# Thought Frameworks
+# Examples
 
-Inversion — Instead of asking how to succeed, ask how you might fail and then avoid those behaviors.
+Binary Search Example — Given sorted array [1,3,5,7,9], to find 7: check middle (5), 7>5 so search right half, check 7, found! Demonstrates: logarithmic time complexity.
 
-Opportunity cost — Every choice excludes alternatives; evaluate decisions based on what you are giving up.
+The Marshmallow Test — Children offered one marshmallow now or two if they wait. Those who waited had better life outcomes. Demonstrates: delayed gratification, self-control.
 
-First principles thinking — Break a problem down to its most basic truths and reason up from there.
+# Procedures
+
+How to Debug Code — 1. Reproduce the bug consistently. 2. Isolate the problem area. 3. Form a hypothesis. 4. Test the hypothesis. 5. Fix and verify.
+
+Scientific Method — 1. Observe. 2. Form hypothesis. 3. Design experiment. 4. Collect data. 5. Analyze. 6. Draw conclusions.
+
+# Questions
+
+Why do we procrastinate on important tasks but easily do trivial ones? Related: temporal discounting, present bias.
+
+What would happen if interest rates went negative everywhere? Economic thought experiment.
+
+# Connections
+
+Compound interest is like evolution — both involve small changes accumulating over time to create dramatic results. Key insight: patience and time are the multipliers.
+
+Code refactoring is like editing prose — both involve restructuring without changing the meaning/behavior.
+
+# Notes
+
+Noticed today that my best work happens in 90-minute focused blocks. Maybe related to ultradian rhythms?
+
+Reading "Thinking Fast and Slow" - the two systems model explains so much about cognitive biases.
+
+# References
+
+"Thinking, Fast and Slow" by Daniel Kahneman — behavioral economics, cognitive biases. See chapters 1-4 for System 1 vs System 2.
+
+https://en.wikipedia.org/wiki/Pareto_principle — Good overview of the 80/20 rule with historical context.
 `;
 
 export async function POST(request: NextRequest) {
@@ -89,9 +113,7 @@ export async function POST(request: NextRequest) {
         title: `Test Entry ${i + 1}`,
         content: chunk.clean,
         tags: [] as string[],
-        vocabData: null,
-        quoteData: null,
-        phraseData: null,
+        metadata: null,
         confidence: 0,
         isTemplate: false,
         parseError: false,
@@ -103,12 +125,15 @@ export async function POST(request: NextRequest) {
     }
 
     const validEntryTypes = [
-      "vocab",
+      "concept",
+      "principle",
       "quote",
-      "phrase",
-      "thought_wrapper",
-      "prompt",
-      "reflection",
+      "example",
+      "procedure",
+      "question",
+      "connection",
+      "note",
+      "reference",
       "template",
       "unknown",
     ];
@@ -132,9 +157,7 @@ export async function POST(request: NextRequest) {
         title: entry.title,
         content: entry.content,
         tags: entry.tags,
-        vocabData: toJsonOrNull(entry.vocabData),
-        quoteData: toJsonOrNull(entry.quoteData),
-        phraseData: toJsonOrNull(entry.phraseData),
+        metadata: toJsonOrNull(entry.metadata),
         confidence: entry.confidence,
         isTemplate: entry.isTemplate,
         parseError: entry.parseError,

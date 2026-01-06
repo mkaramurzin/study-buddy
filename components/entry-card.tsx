@@ -2,27 +2,14 @@
 
 import { useState } from "react";
 
-interface VocabData {
-  term?: string;
-  part_of_speech?: string;
-  definition?: string;
-  example_sentence?: string;
-  reciprocal_word?: string;
-  synonyms?: string[];
-}
+// Generic metadata type - structure varies by entry type
+type Metadata = Record<string, unknown>;
 
-interface QuoteData {
-  quote?: string;
-  author?: string;
-  context?: string;
-}
-
-interface PhraseData {
-  phrase?: string;
-  phrase_type?: string;
-  source_context?: string;
-  why_it_stood_out?: string;
-}
+// Helper to safely get string from unknown metadata field
+const str = (val: unknown): string | null => {
+  if (typeof val === "string" && val.trim()) return val;
+  return null;
+};
 
 interface Entry {
   id: string;
@@ -30,9 +17,7 @@ interface Entry {
   title: string | null;
   content: string | null;
   tags: string[];
-  vocabData: VocabData | null;
-  quoteData: QuoteData | null;
-  phraseData: PhraseData | null;
+  metadata: Metadata | null;
   confidence: number;
   createdAt: string;
 }
@@ -43,114 +28,181 @@ interface EntryCardProps {
 }
 
 const typeColors: Record<string, string> = {
-  vocab: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  concept: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  principle: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   quote: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  phrase: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  thought_wrapper: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  prompt: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
-  reflection: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200",
+  example: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  procedure: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+  question: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
+  connection: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200",
+  note: "bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200",
+  reference: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+  template: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
   unknown: "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200",
 };
 
 export function EntryCard({ entry, onDelete }: EntryCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const m = entry.metadata || {};
 
-  const renderVocab = (vocab: VocabData) => (
+  const renderConcept = () => (
     <div className="space-y-2">
       <div>
         <span className="font-semibold text-neutral-900 dark:text-neutral-100">
-          {vocab.term}
+          {str(m.term) || entry.title || ""}
         </span>
-        {vocab.part_of_speech && (
-          <span className="ml-2 text-sm italic text-neutral-500">
-            ({vocab.part_of_speech})
-          </span>
+        {str(m.field) && (
+          <span className="ml-2 text-sm text-neutral-500">({str(m.field)})</span>
         )}
       </div>
-      {vocab.definition && (
-        <p className="text-neutral-700 dark:text-neutral-300">
-          {vocab.definition}
-        </p>
+      {str(m.definition) && (
+        <p className="text-neutral-700 dark:text-neutral-300">{str(m.definition)}</p>
       )}
-      {vocab.example_sentence && (
+      {Array.isArray(m.examples) && m.examples.length > 0 && (
         <p className="text-sm text-neutral-600 dark:text-neutral-400 italic">
-          &ldquo;{vocab.example_sentence}&rdquo;
-        </p>
-      )}
-      {vocab.reciprocal_word && (
-        <p className="text-sm text-neutral-500">
-          <span className="font-medium">Opposite:</span> {vocab.reciprocal_word}
-        </p>
-      )}
-      {vocab.synonyms && vocab.synonyms.length > 0 && (
-        <p className="text-sm text-neutral-500">
-          <span className="font-medium">Synonyms:</span>{" "}
-          {vocab.synonyms.join(", ")}
+          Example: {m.examples.map(String).join("; ")}
         </p>
       )}
     </div>
   );
 
-  const renderQuote = (quote: QuoteData) => (
+  const renderPrinciple = () => (
+    <div className="space-y-2">
+      <p className="font-semibold text-neutral-900 dark:text-neutral-100">
+        {str(m.name) || entry.title || ""}
+      </p>
+      {str(m.statement) && (
+        <p className="text-neutral-700 dark:text-neutral-300">{str(m.statement)}</p>
+      )}
+      {str(m.domain) && (
+        <p className="text-sm text-neutral-500">Domain: {str(m.domain)}</p>
+      )}
+      {str(m.conditions) && (
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 italic">
+          Conditions: {str(m.conditions)}
+        </p>
+      )}
+    </div>
+  );
+
+  const renderQuote = () => (
     <div className="space-y-2">
       <blockquote className="text-neutral-700 dark:text-neutral-300 border-l-2 border-neutral-300 dark:border-neutral-600 pl-4 italic">
-        &ldquo;{quote.quote}&rdquo;
+        &ldquo;{str(m.text) || entry.content || ""}&rdquo;
       </blockquote>
-      {quote.author && (
-        <p className="text-sm text-neutral-500">— {quote.author}</p>
+      {str(m.author) && <p className="text-sm text-neutral-500">— {str(m.author)}</p>}
+      {str(m.source) && <p className="text-sm text-neutral-500">Source: {str(m.source)}</p>}
+    </div>
+  );
+
+  const renderExample = () => (
+    <div className="space-y-2">
+      <p className="font-semibold text-neutral-900 dark:text-neutral-100">
+        {str(m.title) || entry.title || ""}
+      </p>
+      {str(m.description) && (
+        <p className="text-neutral-700 dark:text-neutral-300">{str(m.description)}</p>
       )}
-      {quote.context && (
-        <p className="text-sm text-neutral-500">{quote.context}</p>
+      {str(m.demonstrates) && (
+        <p className="text-sm text-neutral-500">Demonstrates: {str(m.demonstrates)}</p>
       )}
     </div>
   );
 
-  const renderPhrase = (phrase: PhraseData) => (
+  const renderProcedure = () => (
     <div className="space-y-2">
-      <p className="font-medium text-neutral-900 dark:text-neutral-100">
-        {phrase.phrase}
+      <p className="font-semibold text-neutral-900 dark:text-neutral-100">
+        {str(m.name) || entry.title || ""}
       </p>
-      {phrase.phrase_type && (
-        <p className="text-sm text-neutral-500">Type: {phrase.phrase_type}</p>
+      {Array.isArray(m.steps) && m.steps.length > 0 && (
+        <ol className="list-decimal list-inside space-y-1 text-neutral-700 dark:text-neutral-300">
+          {m.steps.map((step, i) => (
+            <li key={i}>{String(step)}</li>
+          ))}
+        </ol>
       )}
-      {phrase.source_context && (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {phrase.source_context}
-        </p>
+      {str(m.notes) && (
+        <p className="text-sm text-neutral-500 italic">{str(m.notes)}</p>
       )}
-      {phrase.why_it_stood_out && (
+    </div>
+  );
+
+  const renderQuestion = () => (
+    <div className="space-y-2">
+      <p className="font-semibold text-neutral-900 dark:text-neutral-100">
+        {str(m.question) || entry.title || ""}
+      </p>
+      {str(m.context) && (
+        <p className="text-neutral-700 dark:text-neutral-300">{str(m.context)}</p>
+      )}
+      {str(m.possible_answer) && (
         <p className="text-sm text-neutral-500 italic">
-          {phrase.why_it_stood_out}
+          Possible answer: {str(m.possible_answer)}
         </p>
+      )}
+    </div>
+  );
+
+  const renderConnection = () => (
+    <div className="space-y-2">
+      {str(m.idea_a) && str(m.idea_b) && (
+        <p className="font-medium text-neutral-900 dark:text-neutral-100">
+          {str(m.idea_a)} ↔ {str(m.idea_b)}
+        </p>
+      )}
+      {str(m.relationship) && (
+        <p className="text-neutral-700 dark:text-neutral-300">{str(m.relationship)}</p>
+      )}
+      {str(m.insight) && (
+        <p className="text-sm text-neutral-500 italic">Insight: {str(m.insight)}</p>
       )}
     </div>
   );
 
   const renderContent = () => {
-    if (entry.type === "vocab" && entry.vocabData) {
-      return renderVocab(entry.vocabData);
+    if (!entry.metadata) {
+      return (
+        <div>
+          {entry.title && (
+            <h4 className="font-medium text-neutral-900 dark:text-neutral-100 mb-1">
+              {entry.title}
+            </h4>
+          )}
+          {entry.content && (
+            <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+              {expanded ? entry.content : entry.content.slice(0, 300)}
+              {!expanded && entry.content.length > 300 && "..."}
+            </p>
+          )}
+        </div>
+      );
     }
-    if (entry.type === "quote" && entry.quoteData) {
-      return renderQuote(entry.quoteData);
+
+    switch (entry.type) {
+      case "concept": return renderConcept();
+      case "principle": return renderPrinciple();
+      case "quote": return renderQuote();
+      case "example": return renderExample();
+      case "procedure": return renderProcedure();
+      case "question": return renderQuestion();
+      case "connection": return renderConnection();
+      default:
+        return (
+          <div>
+            {entry.title && (
+              <h4 className="font-medium text-neutral-900 dark:text-neutral-100 mb-1">
+                {entry.title}
+              </h4>
+            )}
+            {entry.content && (
+              <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+                {expanded ? entry.content : entry.content.slice(0, 300)}
+                {!expanded && entry.content.length > 300 && "..."}
+              </p>
+            )}
+          </div>
+        );
     }
-    if (entry.type === "phrase" && entry.phraseData) {
-      return renderPhrase(entry.phraseData);
-    }
-    // Default fallback
-    return (
-      <div>
-        {entry.title && (
-          <h4 className="font-medium text-neutral-900 dark:text-neutral-100 mb-1">
-            {entry.title}
-          </h4>
-        )}
-        {entry.content && (
-          <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
-            {entry.content}
-          </p>
-        )}
-      </div>
-    );
   };
 
   return (
@@ -161,7 +213,7 @@ export function EntryCard({ entry, onDelete }: EntryCardProps) {
             typeColors[entry.type] || typeColors.unknown
           }`}
         >
-          {entry.type.replace("_", " ")}
+          {entry.type}
         </span>
         <div className="flex items-center gap-2">
           {entry.confidence > 0 && (
@@ -174,12 +226,7 @@ export function EntryCard({ entry, onDelete }: EntryCardProps) {
               onClick={() => onDelete(entry.id)}
               className="text-neutral-400 hover:text-red-500 transition-colors"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -207,7 +254,7 @@ export function EntryCard({ entry, onDelete }: EntryCardProps) {
         </div>
       )}
 
-      {entry.content && entry.content.length > 200 && (
+      {entry.content && entry.content.length > 300 && (
         <button
           onClick={() => setExpanded(!expanded)}
           className="mt-2 text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"

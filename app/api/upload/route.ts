@@ -60,12 +60,15 @@ export async function POST(request: NextRequest) {
     const entriesToSave = processedEntries.filter((e) => !e.isTemplate);
 
     const validEntryTypes = [
-      "vocab",
+      "concept",
+      "principle",
       "quote",
-      "phrase",
-      "thought_wrapper",
-      "prompt",
-      "reflection",
+      "example",
+      "procedure",
+      "question",
+      "connection",
+      "note",
+      "reference",
       "template",
       "unknown",
     ];
@@ -90,9 +93,7 @@ export async function POST(request: NextRequest) {
         title: entry.title,
         content: entry.content,
         tags: entry.tags,
-        vocabData: toJsonOrNull(entry.vocabData),
-        quoteData: toJsonOrNull(entry.quoteData),
-        phraseData: toJsonOrNull(entry.phraseData),
+        metadata: toJsonOrNull(entry.metadata),
         confidence: entry.confidence,
         isTemplate: entry.isTemplate,
         parseError: entry.parseError,
