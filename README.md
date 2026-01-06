@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Commonplace Doc Study
 
-## Getting Started
+A web app that helps you study and internalize your commonplace book entries. Upload PDF documents containing vocabulary, quotes, and phrases, and practice with an AI tutor that uses only your own collected material.
 
-First, run the development server:
+## Features
+
+- **PDF Upload & Processing**: Upload commonplace book PDFs and automatically extract and classify entries
+- **AI Classification**: Entries are classified into types: vocab, quote, phrase, thought_wrapper, reflection, etc.
+- **Dashboard**: View and filter all your entries by type
+- **Practice Chat**: Quiz yourself with an AI that uses only your own entries
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Auth**: Clerk
+- **Database**: PostgreSQL via Prisma
+- **Styling**: Tailwind CSS
+- **AI**: OpenAI API (GPT-4o for classification, GPT-4o-mini for chat)
+- **PDF Parsing**: pdf-parse
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file with the following:
+
+```bash
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+
+# Clerk URLs
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# Database (PostgreSQL)
+DATABASE_URL="postgresql://user:password@localhost:5432/commonplace?schema=public"
+
+# OpenAI
+OPENAI_API_KEY=sk-...
+```
+
+### 3. Set up the database
+
+```bash
+# Run migrations
+npx prisma migrate dev --name init
+
+# Or push schema directly (for development)
+npx prisma db push
+```
+
+### 4. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to use the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This app is configured for Vercel deployment:
 
-## Learn More
+1. Push your code to GitHub
+2. Import the project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
 
-To learn more about Next.js, take a look at the following resources:
+For the database, you can use:
+- [Neon](https://neon.tech) (serverless PostgreSQL - recommended)
+- [Supabase](https://supabase.com)
+- [Railway](https://railway.app)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Sign in** using Clerk authentication
+2. **Upload** a PDF of your commonplace book
+3. Wait for AI to **classify** your entries
+4. **Browse** your entries in the dashboard
+5. **Practice** with the AI chat to quiz yourself
 
-## Deploy on Vercel
+## Entry Types
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `vocab`: Vocabulary words with definitions, examples, synonyms
+- `quote`: Quotes with author and context
+- `phrase`: Notable phrases with analysis
+- `thought_wrapper`: Introductory phrases for ideas
+- `reflection`: Personal reflections
+- `template`: Structural content (filtered out by default)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+app/
+├── layout.tsx              # Root layout with Clerk provider
+├── page.tsx                # Landing page
+├── dashboard/page.tsx      # Entries dashboard
+├── upload/page.tsx         # PDF upload page
+├── practice/page.tsx       # Chat practice interface
+├── sign-in/                # Clerk sign-in
+├── sign-up/                # Clerk sign-up
+└── api/
+    ├── upload/route.ts     # PDF upload processing
+    ├── entries/route.ts    # CRUD for entries
+    └── chat/route.ts       # AI chat endpoint
+
+lib/
+├── db.ts                   # Prisma client
+├── pdf-parser.ts           # PDF text extraction
+├── segmenter.ts            # Text chunking logic
+├── classifier.ts           # OpenAI classification
+└── prompts.ts              # LLM prompts
+
+components/
+└── entry-card.tsx          # Display entry by type
+
+prisma/
+└── schema.prisma           # Database schema
+```

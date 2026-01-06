@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Entry {
+  id        String    @id @default(cuid())
+  userId    String
+  uploadId  String
+  docName   String?
+
+  chunkClean String
+  chunkRaw   String
+
+  type    EntryType
+  title   String?
+  content String?
+  tags    String[]
+
+  // Type-specific JSON fields
+  vocabData  Json? // term, part_of_speech, definition, example_sentence, reciprocal_word, synonyms
+  quoteData  Json? // quote, author, context
+  phraseData Json? // phrase, phrase_type, source_context, why_it_stood_out
+
+  confidence Float   @default(0)
+  isTemplate Boolean @default(false)
+  parseError Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, type])
+}
+
+enum EntryType {
+  vocab
+  quote
+  phrase
+  thought_wrapper
+  prompt
+  reflection
+  template
+  unknown
+}
