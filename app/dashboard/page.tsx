@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserMenu } from "@/components/user-menu";
 import { EntryCard } from "@/components/entry-card";
 
 const ENTRY_TYPES = [
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             >
               Practice
             </Link>
-            <UserButton />
+            <UserMenu />
           </div>
         </nav>
       </header>

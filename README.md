@@ -11,12 +11,12 @@ A web app that helps you study and internalize knowledge from any field. Upload 
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Auth**: Clerk
-- **Database**: PostgreSQL via Prisma
+- **Framework**: Next.js 16 (App Router)
+- **Auth & Database**: Supabase
+- **ORM**: Prisma (connects to Supabase PostgreSQL)
 - **Styling**: Tailwind CSS
 - **AI**: OpenAI API (GPT-4o for classification, GPT-4o-mini for chat)
-- **PDF Parsing**: pdf-parse
+- **PDF Parsing**: unpdf
 
 ## Setup
 
@@ -31,16 +31,12 @@ npm install
 Create a `.env` file with the following:
 
 ```bash
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-CLERK_SECRET_KEY=sk_...
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# Clerk URLs
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-
-# Database (PostgreSQL)
-DATABASE_URL="postgresql://user:password@localhost:5432/studybase?schema=public"
+# Database (Supabase PostgreSQL connection string)
+DATABASE_URL="postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres"
 
 # OpenAI
 OPENAI_API_KEY=sk-...
@@ -69,14 +65,9 @@ This app is configured for Vercel deployment:
 3. Add environment variables in Vercel dashboard
 4. Deploy
 
-For the database, you can use:
-- [Neon](https://neon.tech) (serverless PostgreSQL - recommended)
-- [Supabase](https://supabase.com)
-- [Railway](https://railway.app)
-
 ## Usage
 
-1. **Sign in** using Clerk authentication
+1. **Sign up or sign in** using email/password
 2. **Upload** any PDF document
 3. Wait for AI to **classify** your entries
 4. **Browse** your entries in the dashboard
@@ -99,27 +90,36 @@ For the database, you can use:
 
 ```
 app/
-├── layout.tsx              # Root layout with Clerk provider
+├── layout.tsx              # Root layout
 ├── page.tsx                # Landing page
 ├── dashboard/page.tsx      # Entries dashboard
 ├── upload/page.tsx         # PDF upload page
 ├── practice/page.tsx       # Chat practice interface
-├── sign-in/                # Clerk sign-in
-├── sign-up/                # Clerk sign-up
+├── sign-in/page.tsx        # Sign-in form
+├── sign-up/page.tsx        # Sign-up form
+├── auth/callback/route.ts  # OAuth callback handler
 └── api/
     ├── upload/route.ts     # PDF upload processing
     ├── entries/route.ts    # CRUD for entries
+    ├── quiz/route.ts       # Quiz entries endpoint
     └── chat/route.ts       # AI chat endpoint
 
 lib/
 ├── db.ts                   # Prisma client
+├── supabase/
+│   ├── client.ts           # Browser Supabase client
+│   └── server.ts           # Server Supabase client
 ├── pdf-parser.ts           # PDF text extraction
 ├── segmenter.ts            # Text chunking logic
 ├── classifier.ts           # OpenAI classification
 └── prompts.ts              # LLM prompts
 
 components/
-└── entry-card.tsx          # Display entry by type
+├── entry-card.tsx          # Display entry by type
+├── user-menu.tsx           # User dropdown menu
+├── quiz-setup.tsx          # Quiz configuration
+├── quiz-session.tsx        # Active quiz component
+└── quiz-results.tsx        # Quiz results display
 
 prisma/
 └── schema.prisma           # Database schema

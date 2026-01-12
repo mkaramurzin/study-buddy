@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { EntryType } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Fetch entries matching the selected types
     const entries = await prisma.entry.findMany({
       where: {
-        userId,
+        userId: user.id,
         isTemplate: false,
         type: { in: types },
       },
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
     const typeCounts = await prisma.entry.groupBy({
       by: ["type"],
       where: {
-        userId,
+        userId: user.id,
         isTemplate: false,
       },
       _count: { type: true },

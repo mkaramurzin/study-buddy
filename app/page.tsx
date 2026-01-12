@@ -1,31 +1,37 @@
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { createClient } from "@/lib/supabase/server";
+import { UserMenu } from "@/components/user-menu";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       <header className="border-b border-neutral-200 dark:border-neutral-800">
         <nav className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            Studybase
+            Commonplace
           </h1>
           <div className="flex items-center gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-                  Sign in
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
+            {!user ? (
               <Link
-                href="/dashboard"
+                href="/sign-in"
                 className="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
               >
-                Dashboard
+                Sign in
               </Link>
-              <UserButton />
-            </SignedIn>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                >
+                  Dashboard
+                </Link>
+                <UserMenu />
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -33,35 +39,37 @@ export default function Home() {
       <main className="max-w-4xl mx-auto px-4 py-20">
         <div className="text-center space-y-6">
           <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100">
-            Study Your Knowledge Base
+            Study Your Commonplace Book
           </h2>
           <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-            Upload your PDF documents and let AI help you practice
-            and internalize concepts, principles, quotes, and more from any field of study.
+            Upload your PDF commonplace documents and let AI help you practice
+            and internalize vocabulary, quotes, and phrases you&apos;ve collected.
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-6 py-3 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors">
-                  Get Started
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
+            {!user ? (
               <Link
-                href="/upload"
+                href="/sign-in"
                 className="px-6 py-3 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors"
               >
-                Upload Document
+                Get Started
               </Link>
-              <Link
-                href="/practice"
-                className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
-              >
-                Practice
-              </Link>
-            </SignedIn>
+            ) : (
+              <>
+                <Link
+                  href="/upload"
+                  className="px-6 py-3 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors"
+                >
+                  Upload Document
+                </Link>
+                <Link
+                  href="/practice"
+                  className="px-6 py-3 border border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                >
+                  Practice
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -86,8 +94,8 @@ export default function Home() {
               Upload PDFs
             </h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Import your documents and automatically extract concepts, principles,
-              quotes, examples, procedures, and more.
+              Import your commonplace documents and automatically extract vocabulary,
+              quotes, and phrases.
             </p>
           </div>
 

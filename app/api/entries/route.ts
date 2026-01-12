@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { EntryType } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
       isTemplate?: boolean;
       OR?: Array<{ title?: { contains: string; mode: "insensitive" }; content?: { contains: string; mode: "insensitive" } }>;
     } = {
-      userId,
+      userId: user.id,
       isTemplate: false,
     };
 
@@ -53,9 +54,10 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -67,7 +69,7 @@ export async function DELETE(request: NextRequest) {
 
     // Verify ownership
     const entry = await prisma.entry.findFirst({
-      where: { id, userId },
+      where: { id, userId: user.id },
     });
 
     if (!entry) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 import { prisma } from "@/lib/db";
 import { PRACTICE_AGENT_SYSTEM_PROMPT } from "@/lib/prompts";
@@ -15,9 +15,10 @@ interface Message {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Fetch user's entries to provide context
     const entries = await prisma.entry.findMany({
       where: {
-        userId,
+        userId: user.id,
         isTemplate: false,
       },
       select: {

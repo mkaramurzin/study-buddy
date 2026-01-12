@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { segmentText, generateUploadId } from "@/lib/segmenter";
 import { classifyChunks, JsonObject } from "@/lib/classifier";
@@ -74,11 +74,12 @@ https://en.wikipedia.org/wiki/Pareto_principle — Good overview of the 80/20 ru
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId: authUserId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     // In development, allow test requests without auth using a test user ID
     const userId =
-      authUserId ||
+      user?.id ||
       (process.env.NODE_ENV === "development" ? "test_user_dev" : null);
 
     if (!userId) {

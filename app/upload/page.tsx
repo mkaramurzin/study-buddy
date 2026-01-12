@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserMenu } from "@/components/user-menu";
 
 type UploadStatus = "idle" | "uploading" | "processing" | "success" | "error";
 
@@ -107,7 +107,7 @@ export default function UploadPage() {
             >
               Practice
             </Link>
-            <UserButton />
+            <UserMenu />
           </div>
         </nav>
       </header>

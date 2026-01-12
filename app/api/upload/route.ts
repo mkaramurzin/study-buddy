@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { extractTextFromPDF } from "@/lib/pdf-parser";
 import { segmentText, generateUploadId } from "@/lib/segmenter";
@@ -8,9 +8,10 @@ import { EntryType, Prisma } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     const savedEntries = await prisma.entry.createMany({
       data: entriesToSave.map((entry) => ({
-        userId,
+        userId: user.id,
         uploadId,
         docName,
         chunkClean: entry.chunkClean,

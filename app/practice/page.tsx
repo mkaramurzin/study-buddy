@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserMenu } from "@/components/user-menu";
 import { QuizSetup, QuizConfig } from "@/components/quiz-setup";
 import { QuizSession, QuizQuestion, QuizResult, QuizEntry, generateQuestion } from "@/components/quiz-session";
 import { QuizResults } from "@/components/quiz-results";
@@ -93,7 +93,7 @@ export default function PracticePage() {
             >
               Upload
             </Link>
-            <UserButton />
+            <UserMenu />
           </div>
         </nav>
       </header>
