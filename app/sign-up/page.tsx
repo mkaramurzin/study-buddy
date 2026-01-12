@@ -10,7 +10,25 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [anonLoading, setAnonLoading] = useState(false);
   const router = useRouter();
+
+  const handleAnonymousSignIn = async () => {
+    setError(null);
+    setAnonLoading(true);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInAnonymously();
+
+    if (error) {
+      setError(error.message);
+      setAnonLoading(false);
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,12 +104,26 @@ export default function SignUpPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || anonLoading}
             className="w-full py-2.5 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating account..." : "Sign up"}
           </button>
         </form>
+
+        <div className="mt-6 flex items-center gap-3">
+          <div className="flex-1 h-px bg-neutral-200 dark:bg-neutral-800" />
+          <span className="text-xs text-neutral-500">or</span>
+          <div className="flex-1 h-px bg-neutral-200 dark:bg-neutral-800" />
+        </div>
+
+        <button
+          onClick={handleAnonymousSignIn}
+          disabled={loading || anonLoading}
+          className="mt-6 w-full py-2.5 border border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-neutral-700 dark:text-neutral-300"
+        >
+          {anonLoading ? "Signing in..." : "Sign in Anonymously"}
+        </button>
 
         <p className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
           Already have an account?{" "}
