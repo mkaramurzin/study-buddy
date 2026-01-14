@@ -108,7 +108,7 @@ export function segmentText(text: string): TextChunk[] {
   // Section headers to skip (structural, not content)
   const headerPatterns = [
     /^#?\s*(vocabulary|quotes|phrases|thought frameworks|expressions)/i,
-    /^example\s+(commonplace\s+)?notes/i,
+    /^example\s+notes/i,
     /^this document is an example/i,
   ];
 

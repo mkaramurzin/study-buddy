@@ -78,7 +78,7 @@ export default function PracticePage() {
             href="/"
             className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
           >
-            Commonplace
+            Studybase
           </Link>
           <div className="flex items-center gap-4">
             <Link
@@ -120,7 +120,7 @@ export default function PracticePage() {
                 Practice Quiz
               </h1>
               <p className="text-neutral-500">
-                Test yourself on your commonplace entries
+                Test yourself on your study entries
               </p>
             </div>
 
