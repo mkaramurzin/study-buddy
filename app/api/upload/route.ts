@@ -6,6 +6,10 @@ import { segmentText, generateUploadId } from "@/lib/segmenter";
 import { classifyChunks, JsonObject } from "@/lib/classifier";
 import { EntryType, Prisma } from "@prisma/client";
 
+// Allow up to 60 seconds for PDF processing + AI classification
+// Requires Vercel Pro plan for >10s, otherwise capped at 10s on Hobby
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -115,8 +119,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to process document" },
+      { error: "Failed to process document", details: message },
       { status: 500 }
     );
   }
