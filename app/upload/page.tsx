@@ -84,6 +84,31 @@ export default function UploadPage() {
     }
   };
 
+  const handleSampleUpload = async () => {
+    setStatus("processing");
+    setError(null);
+    setResult(null);
+    setFile(null);
+
+    try {
+      const response = await fetch("/api/sample-upload", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          data.details || data.error || "Sample processing failed"
+        );
+      }
+      setResult(data);
+      setStatus("success");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      setStatus("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       <header className="border-b border-neutral-200 dark:border-neutral-800">
@@ -178,6 +203,19 @@ export default function UploadPage() {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={handleSampleUpload}
+            disabled={status === "processing" || status === "uploading"}
+            className="w-full py-3 border border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Process Sample: Articulate Verbiage
+          </button>
+          <p className="mt-2 text-xs text-neutral-500 text-center">
+            One-click demo creates 10–15 entries in your dashboard.
+          </p>
         </div>
 
         {error && (
